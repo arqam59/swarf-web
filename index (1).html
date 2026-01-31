@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Sarf Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #27ae60;
+            --accent: #e67e22;
+            --bg: #f5f6fa;
+        }
+
+        body {
+            font-family: 'Amiri', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Aref+Ruqaa', serif;
+            color: var(--primary);
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: fadeInDown 1s;
+        }
+
+        .search-area {
+            margin: 30px 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            animation: zoomIn 0.8s;
+        }
+
+        input {
+            padding: 15px;
+            font-size: 24px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            width: 300px;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.3);
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.4s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px) scale(1.05);
+            background: #219150;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            display: none; /* Initially hidden */
+            border-top: 5px solid var(--accent);
+        }
+
+        .card h3 {
+            background: var(--primary);
+            color: white;
+            margin: 0;
+            padding: 15px;
+            font-size: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 1.3rem;
+        }
+
+        .pronoun-col {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            background: #f9f9f9;
+            width: 35%;
+        }
+
+        tr:hover {
+            background-color: #fff4e6;
+            transition: 0.2s;
+        }
+
+        .verb-text {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        /* Animation classes for cards */
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        .delay-4 { animation-delay: 0.8s; }
+
+    </style>
+</head>
+<body>
+
+<div class="container animate__animated animate__fadeIn">
+    <h1>المُصَرِّف الذَّكِيّ</h1>
+    <p style="font-size: 1.2rem; color: #666;">അറബിക് ക്രിയകൾ എളുപ്പത്തിൽ പഠിക്കാം</p>
+
+    <div class="search-area">
+        <input type="text" id="verbInput" placeholder="ഉദാ: نصر" maxlength="3">
+        <button onclick="startSarf()">സറഫാക്കുക ✨</button>
+    </div>
+
+    <div class="grid-layout" id="sarfDisplay">
+        <div id="card1" class="card animate__animated">
+            <h3>الفعل الماضي</h3>
+            <table id="maadiTable"></table>
+        </div>
+        <div id="card2" class="card animate__animated">
+            <h3>الفعل المضارع</h3>
+            <table id="mudariTable"></table>
+        </div>
+        <div id="card3" class="card animate__animated">
+            <h3>الأمر</h3>
+            <table id="amrTable"></table>
+        </div>
+        <div id="card4" class="card animate__animated">
+            <h3>النهي</h3>
+            <table id="nahyTable"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function startSarf() {
+        const root = document.getElementById('verbInput').value.trim();
+        if (root.length < 3) {
+            alert("ദയവായി മൂന്നക്ഷര ക്രിയ നൽകുക!");
+            return;
+        }
+
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.style.display = 'none';
+            card.classList.remove('animate__backInUp');
+        });
+
+        setTimeout(() => {
+            processLogic(root);
+            
+            // Show cards with animation delay
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.display = 'block';
+                    card.classList.add('animate__backInUp');
+                }, index * 200);
+            });
+        }, 100);
+    }
+
+    function processLogic(root) {
+        let f = root[0], a = root[1], l = root[2];
+        const pronouns = ["هو", "هما", "هم", "هي", "هما", "هن", "أنت", "أنتما", "أنتم", "أنتِ", "أنتما", "أنتن", "أنا", "نحن"];
+        
+        // Data Arrays
+        const mSuf = ["َ", "َا", "ُوا", "َتْ", "َتَا", "ْنَ", "ْتَ", "ْتُمَا", "ْتُمْ", "ْتِ", "ْتُمَا", "ْتُنَّ", "ْتُ", "ْنَا"];
+        const muPre = ["يَ", "يَ", "يَ", "تَ", "تَ", "يَ", "تَ", "تَ", "تَ", "تَ", "تَ", "تَ", "أَ", "نَ"];
+        const muSuf = ["ُ", "َانِ", "ُونَ", "ُ", "َانِ", "ْنَ", "ُ", "َانِ", "ُونَ", "ِينَ", "َانِ", "ْنَ", "ُ", "ُ"];
+        
+        let maadiHTML = "", mudariHTML = "", amrHTML = "", nahyHTML = "";
+
+        for(let i=0; i<14; i++) {
+            maadiHTML += `<tr><td class="pronoun-col">${pronouns[i]}</td><td class="verb-text">${f+a+l+mSuf[i]}</td></tr>`;
+            mudariHTML += `<tr><td class="pronoun-col">${pronouns[i]}</td><td class="verb-text">${muPre[i]+f+"ْ"+a+"ُ"+l+muSuf[i]}</td></tr>`;
+        }
+
+        const amrP = ["أنت", "أنتما", "أنتم", "أنتِ", "أنتما", "أنتن"];
+        const amrV = ["اُ"+f+"ْ"+a+"ُ"+l+"ْ", "اُ"+f+"ْ"+a+"ُ"+l+"َا", "اُ"+f+"ْ"+a+"ُ"+l+"ُوا", "اُ"+f+"ْ"+a+"ُ"+l+"ِي", "اُ"+f+"ْ"+a+"ُ"+l+"َا", "اُ"+f+"ْ"+a+"ُ"+l+"ْنَ"];
+        const nahyV = ["لَا تَ"+f+"ْ"+a+"ُ"+l+"ْ", "لَا تَ"+f+"ْ"+a+"ُ"+l+"َا", "لَا تَ"+f+"ْ"+a+"ُ"+l+"ُوا", "لَا تَ"+f+"ْ"+a+"ُ"+l+"ِي", "لَا تَ"+f+"ْ"+a+"ُ"+l+"َا", "لَا تَ"+f+"ْ"+a+"ُ"+l+"ْنَ"];
+
+        for(let i=0; i<6; i++) {
+            amrHTML += `<tr><td class="pronoun-col">${amrP[i]}</td><td class="verb-text" style="color:#e67e22">${amrV[i]}</td></tr>`;
+            nahyHTML += `<tr><td class="pronoun-col">${amrP[i]}</td><td class="verb-text" style="color:#c0392b">${nahyV[i]}</td></tr>`;
+        }
+
+        document.getElementById('maadiTable').innerHTML = maadiHTML;
+        document.getElementById('mudariTable').innerHTML = mudariHTML;
+        document.getElementById('amrTable').innerHTML = amrHTML;
+        document.getElementById('nahyTable').innerHTML = nahyHTML;
+    }
+</script>
+
+</body>
+</html>
